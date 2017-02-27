@@ -1,4 +1,3 @@
-package cilib
 package fla
 
 import scalaz._
@@ -6,6 +5,8 @@ import Scalaz._
 
 import spire.math.Interval
 import spire.implicits._
+
+import cilib._
 
 object RandomWalks {
 
@@ -35,7 +36,7 @@ object RandomWalks {
           if (rd =/= i) w0
           else if (b) max
           else min
-    }).map(Position(_, domain))
+    }).map(Point(_, domain))
 
     def doWalk: StateT[RVar, (StartingZones, WalkStep), WalkStep] =
       for {
@@ -52,7 +53,7 @@ object RandomWalks {
         })
         newZone    = w.map(_._1)
         newPosList = w.map(_._2)
-        newPos     = Position(newPosList, domain)
+        newPos     = Point(newPosList, domain)
         _ <- S.put((newZone, newPos))
       } yield newPos
 
@@ -80,7 +81,7 @@ object RandomWalks {
           if (rd =/= i) w0i
           else if (b) max
           else min
-    }).map(Position(_, domain))
+    }).map(Point(_, domain))
 
     def doWalk: StateT[RVar, (StartingZones, WalkStep), WalkStep] =
       for {
@@ -99,7 +100,7 @@ object RandomWalks {
         }
         newZone    = w.map(_._1)
         newPosList = w.map(_._2)
-        newPos     = Position(newPosList, domain)
+        newPos     = Point(newPosList, domain)
         _ <- S.put((newZone, newPos))
       } yield newPos
 

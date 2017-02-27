@@ -1,4 +1,3 @@
-package cilib
 package fla
 
 import org.scalacheck.Gen
@@ -12,7 +11,8 @@ import scalaz.std.list._
 import scalaz.syntax.apply._
 import scalaz.NonEmptyList._
 
-import benchmarks.Benchmarks
+import cilib._
+import cilib.benchmarks.Benchmarks
 import Eval._
 import Metrics._
 

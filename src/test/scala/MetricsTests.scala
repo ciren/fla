@@ -1,4 +1,3 @@
-package cilib
 package fla
 
 import org.scalacheck._
@@ -10,6 +9,7 @@ import scalaz.syntax.traverse._
 
 import spire.math.sqrt
 
+import cilib._
 import Metrics._
 import Generators._
 

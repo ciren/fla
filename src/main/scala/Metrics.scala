@@ -1,4 +1,3 @@
-package cilib
 package fla
 
 import scalaz._
@@ -9,6 +8,7 @@ import spire.math.Interval
 import spire.math.{abs,log,pow,sqrt}
 import spire.algebra.{Field,NRoot}
 
+import cilib._
 import cilib.Sized._
 
 object Metrics {
@@ -70,7 +70,7 @@ object Metrics {
             val lower = bound.lowerValue
             (xi - lower) / (upper - lower)
           }
-          Position(norm, p.boundary)
+          Point(norm, p.boundary)
         }
 
         for {
