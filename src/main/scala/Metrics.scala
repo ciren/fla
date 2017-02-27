@@ -1,56 +1,19 @@
 package fla
 
-import scalaz._
-import Scalaz._
-import scalaz.{Maybe,NonEmptyList}
+import scalaz.{NonEmptyList,\/}
+import scalaz.Scalaz._
+
 import spire.implicits._
-import spire.math.Interval
 import spire.math.{abs,log,pow,sqrt}
-import spire.algebra.{Field,NRoot}
 
 import cilib._
 import cilib.Sized._
+import Helpers._
 
 object Metrics {
 
-  type FunctionMetric[A,R] = NonEmptyList[Position[A]] => Step[A,\/[String,R]]
+  type FunctionMetric[A,R] = NonEmptyList[Position[A]] => Step[A,String \/ R]
   type SimpleFunctionMetric[A] = FunctionMetric[A,A]
-
-  def toSized2And[A](x: NonEmptyList[A]): \/[String,Sized2And[List,A]] =
-    x.toList match {
-      case a :: b :: rest => Sized2And(a, b, rest).right[String]
-      case _ => "Cannot convert input to Sized2And".left[Sized2And[List,A]]
-    }
-
-  def euclid[A:NRoot](a: Position[A], b: Position[A])(implicit A: Field[A]) =
-    sqrt((a - b).pos.map(_ ** 2).foldLeft(A.zero)(_ + _))
-
-  def fitnesses(solutions: NonEmptyList[Position[Double]]): \/[String,NonEmptyList[Double]] =
-    solutions
-      .traverse(_.objective)
-      .toRight("Points have not been evaluated")
-      .flatMap(_.traverseU(_ match {
-        case Single(f, _) => f.fold(_.original.v, _.v, _.v).right[String]
-        case Multi(_) => "Multi objective solutions are not supported".left[Double]
-      }))
-
-  def fittest[A](solutions: NonEmptyList[Position[A]], comp: Comparison): \/[String,Position[A]] =
-    solutions
-      .traverse(s => s match {
-        case Solution(_, _, _) => s.just
-        case Point(_, _) => Maybe.empty[Position[A]]
-      })
-      .toRight("Points have not been evaluated")
-      .map(_.foldLeft1((a, b) => Comparison.compare(a, b) apply comp))
-
-  def sort[A](solutions: NonEmptyList[Position[A]], comp: Comparison): \/[String,NonEmptyList[Position[A]]] =
-    solutions
-      .traverse(s => s match {
-        case Solution(_, _, _) => s.just
-        case Point(_, _) => Maybe.empty[Position[A]]
-      })
-      .toRight("Points have not been evaluated")
-      .map(_.sortWith((a, b) => Comparison.fittest(a, b) apply comp))
 
   def dispersion(threshold: Double): SimpleFunctionMetric[Double] =
     solutions => Step.liftK { o =>

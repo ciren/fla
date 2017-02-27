@@ -8,7 +8,7 @@ import scalaz.syntax.foldable1._
 
 import spire.math.Bounded
 
-import cilib.{Position,RNG}
+import cilib._
 import Generators._
 
 object RandomWalksTests extends Properties("Random Walks") {
@@ -18,10 +18,7 @@ object RandomWalksTests extends Properties("Random Walks") {
   property("domain") = forAll(domainGen) { domain =>
     domain.size >= 1 &&
     domain.all(_.nonEmpty) &&
-    domain.all(i => i match {
-      case Bounded(a, b, _) => a < b
-      case _ => false
-    })
+    domain.all(i => i.lowerValue < i.upperValue)
   }
 
   property("manhattan progressive walk") = forAll(walkParamGen) { case (domain, steps, stepSizePercent) =>

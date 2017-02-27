@@ -16,7 +16,7 @@ import Generators._
 object MetricsTests extends Properties("Metrics") {
 
   type Sample[A] = RVar[NonEmptyList[Position[A]]]
-  type Test[A] = \/[String,A] => Boolean
+  type Test[A] = String \/ A => Boolean
   val min = Comparison dominance Min
 
   def validate[A:spire.math.Numeric,R](points: Sample[A], fm: FunctionMetric[A,R], problem: Eval[A], test: Test[R]) = {
