@@ -10,7 +10,7 @@ import scalaz.syntax.traverse._
 import spire.math.sqrt
 
 import cilib._
-import Metrics._
+import metrics._
 import Generators._
 
 object MetricsTests extends Properties("Metrics") {
@@ -31,8 +31,15 @@ object MetricsTests extends Properties("Metrics") {
   }
 
   property("points not evaluated") = forAll(pointsProblemGen) { case (points, problem) =>
-    val metrics = NonEmptyList(dispersion(0.1), fem, fdc, gradientAvg(0.1),
-      gradientMax(0.1), gradientMax(0.1), informationLandscape)
+    val metrics = NonEmptyList(
+      Dispersion(0.1),
+      FirstEntropicMeasure.metric,
+      FitnessDistanceCorrelation.metric,
+      Gradient.avg(0.1),
+      Gradient.max(0.1),
+      Gradient.dev(0.1),
+      InformationLandscape.metric
+    )
     val experiment = for {
       ps <- Step.pointR(points)
       ms <- metrics.traverseU(_(ps))
@@ -44,49 +51,49 @@ object MetricsTests extends Properties("Metrics") {
 
   property("dispersion (bad threshold)") = forAll(badDispersionGen) { case (points, problem, threshold) =>
     val test: Test[Double] = (r) => r.isLeft
-    validate(points, dispersion(threshold), problem, test)
+    validate(points, Dispersion(threshold), problem, test)
   }
 
   property("dispersion (good threshold)") = forAll(goodDispersionGen) { case (points, problem, threshold) =>
     val dim = points.map(_.head.boundary.size).eval(RNG.fromTime)
     val disp = sqrt(3.0 * dim) / 4.0 - 0.1
-    val test: Test[Double] = (r) => r forall (m => m > -disp && m < sqrt(dim) - disp)
-    validate(points, dispersion(threshold), problem, test)
+    val test: Test[Double] = (r) => r forall (m => m > -disp && m < sqrt(dim.toDouble) - disp)
+    validate(points, Dispersion(threshold), problem, test)
   }
 
   property("first entropic measure (micro)") = forAll(walkProblemGen(0.01)) { case (walk, problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0 && m <= 1.0)
-    validate(walk, fem, problem, test)
+    validate(walk, FirstEntropicMeasure.metric, problem, test)
   }
 
   property("first entropic measure (macro)") = forAll(walkProblemGen(0.1)) { case (walk, problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0 && m <= 1.0)
-    validate(walk, fem, problem, test)
+    validate(walk, FirstEntropicMeasure.metric, problem, test)
   }
 
   property("fitness distance correlation") = forAll(pointsProblemGen) { case (points, problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= -1.0 && m <= 1.0)
-    validate(points, fdc, problem, test)
+    validate(points, FitnessDistanceCorrelation.metric, problem, test)
   }
 
   property("gradient average") = forAll(manhattanWalkProblemGen) { case ((walk, s), problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0)
-    validate(walk, gradientAvg(s), problem, test)
+    validate(walk, Gradient.avg(s), problem, test)
   }
 
   property("gradient deviation") = forAll(manhattanWalkProblemGen) { case ((walk, s), problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0)
-    validate(walk, gradientDev(s), problem, test)
+    validate(walk, Gradient.dev(s), problem, test)
   }
 
   property("gradient maximum") = forAll(manhattanWalkProblemGen) { case ((walk, s), problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0)
-    validate(walk, gradientMax(s), problem, test)
+    validate(walk, Gradient.max(s), problem, test)
   }
 
   property("information landscape") = forAll(pointsProblemGen) { case (points, problem) =>
     val test: Test[Double] = (r) => r forall (m => m >= 0.0 && m <= 1.0)
-    validate(points, informationLandscape, problem, test)
+    validate(points, InformationLandscape.metric, problem, test)
   }
 
 }

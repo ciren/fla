@@ -1,4 +1,5 @@
 package fla
+package metrics
 
 import scalaz.{NonEmptyList,\/}
 import scalaz.Scalaz._

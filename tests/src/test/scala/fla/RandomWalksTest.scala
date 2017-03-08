@@ -10,6 +10,7 @@ import spire.math.Bounded
 
 import cilib._
 import Generators._
+import walks._
 
 object RandomWalksTests extends Properties("Random Walks") {
 
@@ -23,7 +24,7 @@ object RandomWalksTests extends Properties("Random Walks") {
 
   property("manhattan progressive walk") = forAll(walkParamGen) { case (domain, steps, stepSizePercent) =>
     val stepSize = stepSizeValue(stepSizePercent, domain.head)
-    val walk = RandomWalks.progressiveManhattan(domain, steps, stepSize) eval RNG.fromTime
+    val walk = RandomProgressiveManhattanWalk(domain, steps, stepSize) eval RNG.fromTime
 
     (walk.size == steps)  :| "number of steps" &&
     (walk all inDomain)   :| "in domain" &&
@@ -32,7 +33,7 @@ object RandomWalksTests extends Properties("Random Walks") {
 
   property("progressive walk") = forAll(walkParamGen) { case (domain, steps, stepSizePercent) =>
     val stepSize = stepSizeValue(stepSizePercent, domain.head)
-    val walk = RandomWalks.progressive(domain, steps, stepSize) eval RNG.fromTime
+    val walk = RandomProgressiveWalk(domain, steps, stepSize) eval RNG.fromTime
 
     (walk.size == steps)  :| "number of steps" &&
     (walk all inDomain)   :| "in domain" &&

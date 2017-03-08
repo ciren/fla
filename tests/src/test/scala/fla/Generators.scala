@@ -14,7 +14,7 @@ import scalaz.NonEmptyList._
 import cilib._
 import cilib.benchmarks.Benchmarks
 import Eval._
-import Metrics._
+import walks._
 
 object Generators {
 
@@ -43,12 +43,12 @@ object Generators {
 
   def progressiveWalkGen(stepSizePercent: Double) = (domainGen |@| stepGen) { (domain, steps) =>
     val stepSize = stepSizeValue(stepSizePercent, domain.head)
-    RandomWalks.progressive(domain, steps, stepSize)
+    RandomProgressiveWalk(domain, steps, stepSize)
   }
 
   val progressiveManhattanWalkGen = walkParamGen.map { case (domain, steps, stepSizePercent) =>
     val stepSize = stepSizeValue(stepSizePercent, domain.head)
-    (RandomWalks.progressiveManhattan(domain, steps, stepSize), stepSize)
+    (RandomProgressiveManhattanWalk(domain, steps, stepSize), stepSize)
   }
 
   val pointsGen = (domainGen |@| stepGen) { (domain, n) =>
