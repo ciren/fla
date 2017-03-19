@@ -12,8 +12,8 @@ import cilib._
 import cilib.Sized.Sized2And
 
 object Helpers {
-  def euclid[A:NRoot](a: Position[A], b: Position[A])(implicit A: Field[A]) =
-    sqrt((a - b).pos.map(_ ** 2).foldLeft(A.zero)(_ + _))
+  implicit val positionFoldable = Position.positionFoldable1
+  def euclid = MetricSpace.minkowski[Position,Double,Double](2).dist _
 
   def toSized2And[A](x: NonEmptyList[A]): String \/ Sized2And[List,A] =
     x.toList match {

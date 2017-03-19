@@ -16,13 +16,14 @@ object RandomWalksExample extends SafeApp {
   val steps = 20
   val stepSize = 1.0
 
-  val progressive = RandomProgressiveWalk(domain, steps, stepSize)
-  val manhattan   = RandomProgressiveManhattanWalk(domain, steps, stepSize)
-
-  val both = (progressive |@| manhattan) { (_, _) }
+  val walks = for {
+    simple      <- SimpleRandomWalk(domain, steps, stepSize)
+    progressive <- RandomProgressiveWalk(domain, steps, stepSize)
+    manhattan   <- RandomProgressiveManhattanWalk(domain, steps, stepSize)
+  } yield (simple, progressive, manhattan)
 
   override val runc: IO[Unit] = {
-    val result = both eval RNG.fromTime
+    val result = walks eval RNG.fromTime
     putStrLn(result.toString)
   }
 }

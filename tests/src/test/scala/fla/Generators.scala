@@ -23,11 +23,9 @@ object Generators {
     b <- Gen.posNum[Double] suchThat (_ > a)
   } yield Interval(a, b)
 
-  def positiveGen(lower: Double) = Gen.posNum[Double] suchThat (_ > lower)
-  def negativeGen(upper: Double) = Gen.negNum[Double] suchThat (_ < upper)
   val badThresholdGen = for {
-    p <- positiveGen(1.0)
-    n <- negativeGen(0.0)
+    p <- Gen.posNum[Double] suchThat (_ > 1.0)
+    n <- Gen.negNum[Double]
     o <- Gen.oneOf(List(p, n))
   } yield o
   val goodThresholdGen = Gen.choose(0.1, 0.9)
@@ -39,15 +37,16 @@ object Generators {
   val stepGen = Gen.posNum[Int] suchThat (_ > 2) map (_ * 10)
   def stepSizeValue(s: Double, i: Interval[Double]) = s * (i.upperValue - i.lowerValue)
 
-  val walkParamGen = (domainGen |@| stepGen |@| stepSizeGen) { (_, _, _) }
+  val walkParamGen = (domainGen |@| stepGen |@| stepSizeGen) { (domain, steps, stepSize) =>
+     (domain, steps, stepSizeValue(stepSize, domain.head))
+  }
 
   def progressiveWalkGen(stepSizePercent: Double) = (domainGen |@| stepGen) { (domain, steps) =>
     val stepSize = stepSizeValue(stepSizePercent, domain.head)
     RandomProgressiveWalk(domain, steps, stepSize)
   }
 
-  val progressiveManhattanWalkGen = walkParamGen.map { case (domain, steps, stepSizePercent) =>
-    val stepSize = stepSizeValue(stepSizePercent, domain.head)
+  val progressiveManhattanWalkGen = walkParamGen.map { case (domain, steps, stepSize) =>
     (RandomProgressiveManhattanWalk(domain, steps, stepSize), stepSize)
   }
 
