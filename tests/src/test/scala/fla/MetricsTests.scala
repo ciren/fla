@@ -96,4 +96,14 @@ object MetricsTests extends Properties("Metrics") {
     validate(points, InformationLandscape.metric, problem, test)
   }
 
+  property("fitness cloud index (cognitive)") = forAll(pointsProblemGen) { case (points, problem) =>
+    val test: Test[Double] = (r) => r forall (m => m >= 0.0 && m <= 1.0)
+    validate(points, FitnessCloudIndex.cognitive, problem, test)
+  }
+
+  property("fitness cloud index (social)") = forAll(pointsProblemGen) { case (points, problem) =>
+    val test: Test[Double] = (r) => r forall (m => m >= 0.0 && m <= 1.0)
+    validate(points, FitnessCloudIndex.social, problem, test)
+  }
+
 }

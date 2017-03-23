@@ -27,7 +27,9 @@ lazy val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Xfuture"
-  )
+  ),
+  resolvers += Resolver.sonatypeRepo("releases"),
+  libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
 )
 
 lazy val flaSettings = buildSettings ++ commonSettings
@@ -50,7 +52,8 @@ lazy val metrics = project
     moduleName := "fla-metrics",
     libraryDependencies ++= Seq(
       "net.cilib"  %% "benchmarks" % "0.1.1",
-      "net.cilib"  %% "cilib-core" % "2.0.0-M3"
+      "net.cilib"  %% "cilib-core" % "2.0.0-M3",
+      "net.cilib"  %% "cilib-pso" % "2.0.0-M3"
     )
   ))
 
