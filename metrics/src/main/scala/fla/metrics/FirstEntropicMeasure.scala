@@ -21,7 +21,7 @@ object FirstEntropicMeasure {
       def S(e: Double, x: Sized2And[List,Double]): List[Int] = {
         def calcS(a: Double, b: Double): Int =
           if (b - a < -e) -1
-          else if (math.abs(b - a) <= e) 0
+          else if (abs(b - a) <= e) 0
           else 1
 
           x.toList.sliding(2).toList.map { case Seq(a, b) => calcS(a, b) }

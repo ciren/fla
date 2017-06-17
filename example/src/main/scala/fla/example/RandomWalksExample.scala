@@ -1,7 +1,6 @@
 package fla
 package example
 
-import scalaz.Scalaz._
 import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 

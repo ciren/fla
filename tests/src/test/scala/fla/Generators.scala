@@ -7,7 +7,6 @@ import spire.math.Interval
 
 import scalaz.NonEmptyList
 import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.std.list._
 import scalaz.syntax.apply._
 import scalaz.NonEmptyList._
 

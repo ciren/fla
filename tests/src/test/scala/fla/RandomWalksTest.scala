@@ -3,7 +3,6 @@ package fla
 import org.scalacheck._
 import org.scalacheck.Prop._
 
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.syntax.foldable1._
 
 import cilib._

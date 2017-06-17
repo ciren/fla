@@ -4,7 +4,6 @@ package metrics
 import scalaz.{NonEmptyList,\/}
 import scalaz.Scalaz._
 
-import spire.algebra.{NRoot,Field}
 import spire.math.sqrt
 import spire.implicits._
 
@@ -24,7 +23,7 @@ object Helpers {
   def fitnesses(solutions: NonEmptyList[Position[Double]]): String \/ NonEmptyList[Double] =
     solutions
       .traverse(_.objective)
-      .toRight("Points have not been evaluated")
+      .toRightDisjunction("Points have not been evaluated")
       .flatMap(_.traverseU(_ match {
         case Single(f, _) => f.fold(_.original.v, _.v, _.v).right[String]
         case Multi(_)     => "Multi objective solutions are not supported".left[Double]

@@ -4,7 +4,6 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 
 import scalaz.{NonEmptyList,\/}
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.syntax.traverse._
 
 import spire.math.sqrt

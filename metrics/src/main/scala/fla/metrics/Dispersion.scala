@@ -4,14 +4,13 @@ package metrics
 import scalaz.Scalaz._
 
 import spire.math.sqrt
-import spire.implicits._
 
 import cilib._
 import Helpers._
 
 object Dispersion {
   def apply(threshold: Double) = metric(threshold)
-  
+
   val metric: Double => SimpleFunctionMetric[Double] =
     threshold => solutions => Step.liftK { o =>
       val dimension = solutions.head.boundary.size
