@@ -11,7 +11,6 @@ import spire.implicits._
 
 import cilib._
 import cilib.benchmarks.Benchmarks
-import Eval._
 import metrics.Gradient
 import walks.RandomProgressiveManhattanWalk
 

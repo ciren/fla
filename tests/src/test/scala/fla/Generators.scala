@@ -12,7 +12,6 @@ import scalaz.NonEmptyList._
 
 import cilib._
 import cilib.benchmarks.Benchmarks
-import Eval._
 import walks._
 
 object Generators {

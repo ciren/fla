@@ -4,7 +4,7 @@ scala:
 jdk:
 - oraclejdk8
 script:
-- sbt clean coverage test
+- sbt clean coverage test coverageReport
 notifications:
   irc: irc.freenode.org#cilib
   webhooks:
@@ -14,8 +14,8 @@ notifications:
     on_failure: always
     on_start: false
 after_success:
-- pip install --user codecov && codecov
-# - "[[ $TRAVIS_BRANCH == \"master\" ]] && { travis_wait 60 sbt publish; };"
+  - bash <(curl -s https://codecov.io/bash)
+# - "[[ $TRAVIS_BRANCH == \"master\" ]] && { sbt publish; };"
 branches:
   only:
     - master
