@@ -28,10 +28,10 @@ object FitnessCloudIndex {
       }
       // 5, 6, 7, 10
       for {
-        point    <- Step evalF pos
+        point    <- Step evalP pos
         newPoint <- Step pointR z.map(Point(_, pos.boundary))
-        newSol   <- Step evalF newPoint
-        sorted   <- Step.liftK { o =>
+        newSol   <- Step evalP newPoint
+        sorted   <- Step.withCompare { o =>
           NonEmptyList(point, newSol).sortWith((a, b) => Comparison.fittest(a, b) apply o)
         }
       } yield Entity(Mem(sorted.head, pos.zeroed), sorted.last)
@@ -48,11 +48,11 @@ object FitnessCloudIndex {
       val iteration0 = solutions traverseU createParticle
 
       for {
-        i0     <- iteration0 map (_.toList)
+        i0     <- iteration0
         i1     <- alg run i0
         i2     <- alg run i1
-        zipped  = (i0 zip i2) filter { case (i0i, i2i) => inBounds(i2i) }
-        better <- Step.liftK { o =>
+        zipped  = (i0 zip i2).list.filter { case (i0i, i2i) => inBounds(i2i) }
+        better <- Step.withCompare { o =>
           zipped filter { case (i0i, i2i) => Comparison.fittest(i2i.pos, i0i.pos) apply o }
         }
       } yield zipped.length match {
@@ -62,7 +62,7 @@ object FitnessCloudIndex {
     }
 
   val cognitive: SimpleFunctionMetric[Double] = {
-    val cognitiveIteration: List[Particle[Mem[Double],Double]] => Particle[Mem[Double],Double] => Step[Double,Particle[Mem[Double],Double]] =
+    val cognitiveIteration: NonEmptyList[Particle[Mem[Double],Double]] => Particle[Mem[Double],Double] => Step[Double,Particle[Mem[Double],Double]] =
       collection => x => {
         val w     = 0.7298
         val c1    = 1.496
@@ -81,7 +81,7 @@ object FitnessCloudIndex {
   }
 
   val social: SimpleFunctionMetric[Double] = {
-    val socialIteration: List[Particle[Mem[Double],Double]] => Particle[Mem[Double],Double] => Step[Double,Particle[Mem[Double],Double]] =
+    val socialIteration: NonEmptyList[Particle[Mem[Double],Double]] => Particle[Mem[Double],Double] => Step[Double,Particle[Mem[Double],Double]] =
       collection => x => {
         val w     = 0.7298
         val c1    = 1.496

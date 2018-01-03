@@ -23,7 +23,7 @@ object FirstEntropicMeasureExample extends SafeApp {
   def femFromStepSize(ss: Double) =
     for {
       points    <- Step pointR RandomProgressiveWalk(domain, 100, stepSize(ss, domain.head))
-      solutions <- points traverseU Step.evalF[Double]
+      solutions <- points traverseU Step.evalP[Double]
       fem       <- FirstEntropicMeasure(solutions)
     } yield fem
 
@@ -31,11 +31,14 @@ object FirstEntropicMeasureExample extends SafeApp {
   val femMicro = femFromStepSize(.01)
   val both = (femMacro |@| femMicro) { (_, _) }
 
-  val min     = Comparison dominance Min
-  val problem = Eval unconstrained Benchmarks.spherical[NonEmptyList, Double]
+   val env =
+    Environment(
+      cmp = Comparison dominance Min,
+      eval = Eval.unconstrained(Benchmarks.spherical[NonEmptyList, Double]).eval,
+      bounds = domain)
 
   override val runc: IO[Unit] = {
-    val result = both.run(min)(problem) eval RNG.fromTime
+    val result = both.run(env) eval RNG.fromTime
     putStrLn(result.toString)
   }
 }

@@ -11,7 +11,7 @@ import Helpers._
 
 object Gradient {
   val gradients: Double => FunctionMetric[Double,List[Double]] =
-    stepSize => solutions => Step.liftK { o =>
+    stepSize => solutions => Step.withCompare { o =>
       val sorted = sort(solutions, o)
       val fits = sorted flatMap fitnesses
 

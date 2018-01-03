@@ -12,7 +12,7 @@ object Dispersion {
   def apply(threshold: Double) = metric(threshold)
 
   val metric: Double => SimpleFunctionMetric[Double] =
-    threshold => solutions => Step.liftK { o =>
+    threshold => solutions => Step.withCompare { o =>
       val dimension = solutions.head.boundary.size
       // approximation of full dispersion
       val fullDispersion = sqrt(3.0 * dimension) / 4.0 - 0.1

@@ -49,15 +49,12 @@ object Generators {
   }
 
   val pointsGen = (domainGen |@| stepGen) { (domain, n) =>
-    for {
-      head <- Position.createPosition(domain)
-      rest <- Position.createPositions(domain, n - 1)
-    } yield NonEmptyList(head, rest: _*)
+    positiveInt(n) { value => Position.createPositions(domain, value) }
   }
 
   def problemNel(f: NonEmptyList[Double] => Double) = Eval.unconstrained(f)
 
-  val problemGen: Gen[Eval[Double]] = Gen.oneOf(List(
+  val problemGen: Gen[Eval[NonEmptyList,Double]] = Gen.oneOf(List(
     problemNel(Benchmarks.rastrigin),
     problemNel(Benchmarks.absoluteValue),
     problemNel(Benchmarks.ackley),

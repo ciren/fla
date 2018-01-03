@@ -21,17 +21,20 @@ object GradientExample extends SafeApp {
 
   val gradients = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalF[Double]
+    solutions <- ps traverseU Step.evalP[Double]
     avg       <- Gradient.avg(stepSize)(solutions)
     max       <- Gradient.max(stepSize)(solutions)
     dev       <- Gradient.dev(stepSize)(solutions)
   } yield (avg, dev, max)
 
-  val min     = Comparison dominance Min
-  val problem = Eval unconstrained Benchmarks.spherical[NonEmptyList, Double]
+  val env =
+    Environment(
+      cmp = Comparison dominance Min,
+      eval = Eval.unconstrained(Benchmarks.spherical[NonEmptyList, Double]).eval,
+      bounds = domain)
 
   override val runc: IO[Unit] = {
-    val result = gradients.run(min)(problem) eval RNG.fromTime
+    val result = gradients.run(env) eval RNG.fromTime
     putStrLn(result.toString)
   }
 }

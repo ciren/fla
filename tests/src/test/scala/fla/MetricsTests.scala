@@ -7,6 +7,8 @@ import scalaz.{NonEmptyList,\/}
 import scalaz.syntax.traverse._
 
 import spire.math.sqrt
+import spire.math.Interval
+import spire.implicits._
 
 import cilib._
 import metrics._
@@ -16,16 +18,21 @@ object MetricsTests extends Properties("Metrics") {
 
   type Sample[A] = RVar[NonEmptyList[Position[A]]]
   type Test[A] = String \/ A => Boolean
-  val min = Comparison dominance Min
 
-  def validate[A:spire.math.Numeric,R](points: Sample[A], fm: FunctionMetric[A,R], problem: Eval[A], test: Test[R]) = {
+  def validate[A:spire.math.Numeric,R](points: Sample[A], fm: FunctionMetric[A,R], problem: Eval[NonEmptyList,A], test: Test[R]) = {
     val experiment = for {
       ps        <- Step.pointR(points)
-      solutions <- ps traverseU Step.evalF[A]
+      solutions <- ps traverseU Step.evalP[A]
       metric    <- fm(solutions)
     } yield metric
 
-    val result = experiment.run(min)(problem) eval RNG.fromTime
+    val env =
+      Environment(
+        cmp = Comparison dominance Min,
+        eval = problem.eval,
+        bounds = Interval(-10.0,10.0)^2)
+
+    val result = experiment.run(env) eval RNG.fromTime
     test(result)
   }
 
@@ -44,7 +51,13 @@ object MetricsTests extends Properties("Metrics") {
       ms <- metrics.traverseU(_(ps))
     } yield ms
 
-    val result = experiment.run(min)(problem) eval RNG.fromTime
+    val env =
+      Environment(
+        cmp = Comparison dominance Min,
+        eval = problem.eval,
+        bounds = Interval(-10.0,10.0)^2)
+
+    val result = experiment.run(env) eval RNG.fromTime
     result.all(_.isLeft)
   }
 

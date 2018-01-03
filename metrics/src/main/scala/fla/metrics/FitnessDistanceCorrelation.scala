@@ -15,7 +15,7 @@ object FitnessDistanceCorrelation {
   def apply(solutions: NonEmptyList[Position[Double]]) = metric(solutions)
 
   val metric: SimpleFunctionMetric[Double] =
-    solutions => Step.liftK { o =>
+    solutions => Step.withCompare { o =>
       val fits = fitnesses(solutions)
       val best = fittest(solutions, o)
 
