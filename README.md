@@ -40,7 +40,7 @@ or in most cases, simply:
 type SimpleFunctionMetric[A] = FunctionMetric[A,A]
 ```
 
-The random walk algorithms have the type:
+The random walk algorithms have the types:
 
 ```scala
 type Walk = NonEmptyList[Position[Double]]
@@ -60,25 +60,24 @@ Function metrics are used in the following way:
 val domain = Interval(-10.0, 10.0)^2
 
 // generate list of points
-val points: RVar[NonEmptyList[Position[Double]]] = for {
-  first <- Position.createPosition(domain)
-  rest  <- Position.createPositions(domain, 99)
-} yield NonEmptyList(first, rest: _*)
+val points = Position.createPositions(domain, 100)
 
 // evaluate points and apply function metric to them
 val dispersion = for {
   ps        <- Step.pointR(points)
-  solutions <- ps traverseU Step.evalF[Double]
+  solutions <- ps traverseU Step.evalP[Double]
   metric    <- Dispersion(.1)(solutions)
 } yield metric
 
-// minimazation problem
-val min     = Comparison dominance Min
-// spherical benchmark function
-val problem = Eval unconstrained Benchmarks.spherical[NonEmptyList, Double]
+// create environment
+val env = Environment(
+  cmp    = Comparison dominance Min,
+  eval   = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double]).eval,
+  bounds = domain
+)
 
 // evaluate the metric using a time-seeded RNG
-val result = dispersion.run(min)(problem) eval RNG.fromTime
+val result = dispersion.run(env) eval RNG.fromTime
 ```
 
 Random walks can be generated in the following way:
@@ -95,5 +94,5 @@ val steps = 100
 val stepSize = 1.0
 
 val progressive = RandomProgressiveWalk(domain, steps, stepSize)
-val result = both eval RNG.fromTime
+val result = progressive eval RNG.fromTime
 ```
