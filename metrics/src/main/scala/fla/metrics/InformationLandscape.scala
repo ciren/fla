@@ -8,7 +8,6 @@ import spire.math.abs
 import spire.implicits._
 
 import cilib._
-import cilib.Sized.Sized2And
 import Helpers._
 
 object InformationLandscape {
@@ -26,7 +25,7 @@ object InformationLandscape {
         else if (a == b) 0.5
         else 0
 
-      def ilVector(x: Sized2And[List,Double]): List[Double] =
+      def ilVector(x: NonEmptyList[Double]): List[Double] =
         x.toList.sliding(2).toList.map { case Seq(f1, f2) => il(f1, f2) }
 
       val best = fittest(solutions, o)

@@ -8,17 +8,14 @@ import spire.math.sqrt
 import spire.implicits._
 
 import cilib._
-import cilib.Sized.Sized2And
 
 object Helpers {
   implicit val positionFoldable = Position.positionFoldable1
   def euclid = MetricSpace.minkowski[Position,Double,Double](2).dist _
 
-  def toSized2And[A](x: NonEmptyList[A]): String \/ Sized2And[List,A] =
-    x.toList match {
-      case a :: b :: rest => Sized2And(a, b, rest).right[String]
-      case _ => "Cannot convert input to Sized2And".left[Sized2And[List,A]]
-    }
+  def toSized2And[A](x: NonEmptyList[A]): String \/ NonEmptyList[A] =
+    if (x.length >= 2) x.right[String]
+    else "Cannot convert input to Sized2And".left[NonEmptyList[A]]
 
   def fitnesses(solutions: NonEmptyList[Position[Double]]): String \/ NonEmptyList[Double] =
     solutions

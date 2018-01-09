@@ -8,7 +8,6 @@ import spire.math.{abs,log,pow}
 import spire.implicits._
 
 import cilib._
-import cilib.Sized.Sized2And
 import Helpers._
 
 object FirstEntropicMeasure {
@@ -18,7 +17,7 @@ object FirstEntropicMeasure {
   val metric: SimpleFunctionMetric[Double] =
     solutions => {
 
-      def S(e: Double, x: Sized2And[List,Double]): List[Int] = {
+      def S(e: Double, x: NonEmptyList[Double]): List[Int] = {
         def calcS(a: Double, b: Double): Int =
           if (b - a < -e) -1
           else if (abs(b - a) <= e) 0
@@ -29,7 +28,7 @@ object FirstEntropicMeasure {
 
       def isLandscapeFlat(x: List[Int]) = x.forall(_ === 0)
 
-      def infoStability(x: Sized2And[List,Double]): Double = {
+      def infoStability(x: NonEmptyList[Double]): Double = {
         // eb, es, e, eo
         type IS = (Double, Double, Double, Int)
 
@@ -63,7 +62,7 @@ object FirstEntropicMeasure {
         e
       }
 
-      def infoContent(e: Double, x: Sized2And[List, Double]) = {
+      def infoContent(e: Double, x: NonEmptyList[Double]) = {
         def hash(p: Int, q: Int): Int = {
           val x = -p + 2 * q
           if (x < 0) x + 3

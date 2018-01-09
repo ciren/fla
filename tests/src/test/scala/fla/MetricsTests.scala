@@ -5,9 +5,8 @@ import org.scalacheck.Prop._
 
 import scalaz.{NonEmptyList,\/}
 import scalaz.syntax.traverse._
-
-import spire.math.sqrt
-import spire.math.Interval
+import shapeless._
+import spire.math.{Interval,sqrt}
 import spire.implicits._
 
 import cilib._
@@ -18,11 +17,17 @@ object MetricsTests extends Properties("Metrics") {
 
   type Sample[A] = RVar[NonEmptyList[Position[A]]]
   type Test[A] = String \/ A => Boolean
+  type D[A] = Sized[IndexedSeq[A],nat._2]
 
-  def validate[A:spire.math.Numeric,R](points: Sample[A], fm: FunctionMetric[A,R], problem: Eval[NonEmptyList,A], test: Test[R]) = {
+  def validate[N<:Nat,R](
+    points: Sample[Double],
+    fm: FunctionMetric[Double,R],
+    problem: Eval[D,Double],
+    test: Test[R]
+  ) = {
     val experiment = for {
       ps        <- Step.pointR(points)
-      solutions <- ps traverseU Step.evalP[A]
+      solutions <- ps traverseU Step.evalP[Double]
       metric    <- fm(solutions)
     } yield metric
 

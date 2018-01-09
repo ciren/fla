@@ -3,8 +3,9 @@ name := "fla"
 val scalazVersion     = "7.2.7"
 val spireVersion      = "0.13.0"
 val scalacheckVersion = "1.12.6"
-val benchmarksVersion = "0.1.1"
+val benchmarksVersion = "0.1.3-SNAPSHOT"
 val cilibVersion      = "2.0.0-SNAPSHOT"
+val shapelessVersion  = "2.3.2"
 
 lazy val buildSettings = Seq(
   organization := "net.cilib",
@@ -65,8 +66,9 @@ lazy val example = project
   .settings(flaSettings ++ Seq(
     moduleName := "fla-example",
     libraryDependencies ++= Seq(
-      "net.cilib" %% "benchmarks" % benchmarksVersion,
-      "net.cilib" %% "cilib-core" % cilibVersion
+      "net.cilib"   %% "benchmarks" % benchmarksVersion,
+      "net.cilib"   %% "cilib-core" % cilibVersion,
+      "com.chuusai" %% "shapeless"  % shapelessVersion
     )
   ))
 

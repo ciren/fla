@@ -5,13 +5,15 @@ import org.scalacheck.Gen
 import spire.implicits._
 import spire.math.Interval
 
-import scalaz.NonEmptyList
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.syntax.apply._
-import scalaz.NonEmptyList._
+import shapeless._
+import shapeless.ops.nat._
 
 import cilib._
-import cilib.benchmarks.Benchmarks
+import benchmarks.Benchmarks
+import benchmarks.dimension._
+import benchmarks.implicits._
 import walks._
 
 object Generators {
@@ -28,8 +30,9 @@ object Generators {
   } yield o
   val goodThresholdGen = Gen.choose(0.1, 0.9)
 
-  val dimGen = Gen.posNum[Int] suchThat (_ >= 2)
-  val domainGen = (intervalGen |@| dimGen) { _ ^ _ }
+  // val dimGen = Gen.posNum[Int] suchThat (_ >= 2)
+  // val domainGen = (intervalGen |@| dimGen) { _ ^ _ }
+  val domainGen = intervalGen map { _ ^ 2 }
 
   val stepSizeGen = Gen.choose(0.0, 0.3)
   val stepGen = Gen.posNum[Int] suchThat (_ > 2) map (_ * 10)
@@ -52,13 +55,13 @@ object Generators {
     positiveInt(n) { value => Position.createPositions(domain, value) }
   }
 
-  def problemNel(f: NonEmptyList[Double] => Double) = Eval.unconstrained(f)
+  def problemNel[N<:Nat:ToInt](f: Dimension[N,Double] => Double) = f.unconstrained
 
-  val problemGen: Gen[Eval[NonEmptyList,Double]] = Gen.oneOf(List(
-    problemNel(Benchmarks.rastrigin),
-    problemNel(Benchmarks.absoluteValue),
-    problemNel(Benchmarks.ackley),
-    problemNel(Benchmarks.spherical)
+  val problemGen = Gen.oneOf(List(
+    problemNel(Benchmarks.spherical[nat._2,Double] _),
+    problemNel(Benchmarks.absoluteValue[nat._2,Double] _),
+    problemNel(Benchmarks.ackley[nat._2,Double] _),
+    problemNel(Benchmarks.spherical[nat._2,Double] _)
   ))
 
   val pointsProblemGen = (pointsGen |@| problemGen) { (_, _) }
