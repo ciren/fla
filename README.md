@@ -1,4 +1,8 @@
 # fla
+
+[![Build Status](https://travis-ci.org/cirg-up/fla.svg?branch=master)](https://travis-ci.org/cirg-up/fla)
+[![codecov.io](https://codecov.io/github/cirg-up/fla/coverage.svg?branch=master)](https://codecov.io/github/cirg-up/fla?branch=master)
+
 A collection of traversal algorithms and function metrics used in Fitness Landscape Analysis
 
 All function metrics have been implemented for use on continuous-domain problems.
@@ -69,10 +73,13 @@ val dispersion = for {
   metric    <- Dispersion(.1)(solutions)
 } yield metric
 
+// define fitness landscape
+val f = Benchmarks.spherical[nat._2,Double] _
+
 // create environment
 val env = Environment(
   cmp    = Comparison dominance Min,
-  eval   = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double]).eval,
+  eval   = f.unconstrained.eval,
   bounds = domain
 )
 

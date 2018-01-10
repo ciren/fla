@@ -31,6 +31,7 @@ lazy val commonSettings = Seq(
     "-Ywarn-value-discard",
     "-Xfuture"
   ),
+  coverageExcludedPackages := "fla\\.example\\..*",
   resolvers += Resolver.sonatypeRepo("releases"),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
@@ -47,7 +48,7 @@ lazy val walks = project
   .settings(flaSettings ++ Seq(
     moduleName := "fla-walks",
     libraryDependencies ++= Seq(
-      "net.cilib" %% "cilib-core" % "2.0.0-SNAPSHOT"
+      "net.cilib" %% "cilib-core" % cilibVersion
     )
   ))
 
