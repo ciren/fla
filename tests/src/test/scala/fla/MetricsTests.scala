@@ -3,11 +3,10 @@ package fla
 import org.scalacheck._
 import org.scalacheck.Prop._
 
-import scalaz.{NonEmptyList,\/}
+import scalaz.{NonEmptyList,-\/,\/,\/-}
 import scalaz.syntax.traverse._
 import shapeless._
-import spire.math.{Interval,sqrt}
-import spire.implicits._
+import spire.math.sqrt
 
 import cilib._
 import metrics._
@@ -34,11 +33,14 @@ object MetricsTests extends Properties("Metrics") {
     val env =
       Environment(
         cmp = Comparison dominance Min,
-        eval = problem.eval,
-        bounds = Interval(-10.0,10.0)^2)
+        eval = problem.eval)
 
     val result = experiment.run(env) eval RNG.fromTime
-    test(result)
+
+    result match {
+      case -\/(error) => false
+      case \/-(r) => test(r)
+    }
   }
 
   property("points not evaluated") = forAll(pointsProblemGen) { case (points, problem) =>
@@ -59,11 +61,12 @@ object MetricsTests extends Properties("Metrics") {
     val env =
       Environment(
         cmp = Comparison dominance Min,
-        eval = problem.eval,
-        bounds = Interval(-10.0,10.0)^2)
+        eval = problem.eval)
 
-    val result = experiment.run(env) eval RNG.fromTime
-    result.all(_.isLeft)
+    experiment.run(env) eval RNG.fromTime match {
+      case -\/(error) => false
+      case \/-(result) => result.all(_.isLeft)
+    }
   }
 
   property("dispersion (bad threshold)") = forAll(badDispersionGen) { case (points, problem, threshold) =>

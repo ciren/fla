@@ -40,7 +40,7 @@ object Helpers {
         case s @ Solution(_, _, _) => s.right[String]
         case Point(_, _) => "One or more points have not been evaluated".left[Position[A]]
       })
-      .map(_.sortWith((a, b) => Comparison.fittest(a, b) apply comp))
+      .map(_.sortWith((a, b) => Comparison.fitter(a, b) apply comp))
 
   def mean(xs: NonEmptyList[Double]) =
     xs.suml1 / xs.count

@@ -32,8 +32,7 @@ object FitnessCloudIndexExample extends SafeApp {
 
   val env = Environment(
     cmp = Comparison dominance Min,
-    eval = f.unconstrained.eval,
-    bounds = domain
+    eval = f.unconstrained.eval
   )
 
   override val runc: IO[Unit] = {

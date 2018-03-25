@@ -1,15 +1,15 @@
 name := "fla"
 
-val scalazVersion     = "7.2.7"
-val spireVersion      = "0.13.0"
-val scalacheckVersion = "1.12.6"
 val benchmarksVersion = "0.1.3-SNAPSHOT"
-val cilibVersion      = "2.0.0-SNAPSHOT"
-val shapelessVersion  = "2.3.2"
+val scalazVersion     = "7.2.20"
+val spireVersion      = "0.13.0"
+val scalacheckVersion = "1.12.6" // remain on 1.12.x because scalaz-binding is built against this version
+val cilibVersion      = "2.0.1"
+val shapelessVersion  = "2.3.3"
 
 lazy val buildSettings = Seq(
   organization := "net.cilib",
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.5",
   version := "0.0.2"
 )
 
@@ -34,7 +34,7 @@ lazy val commonSettings = Seq(
   coverageExcludedPackages := "fla\\.example\\..*",
   resolvers += Resolver.sonatypeRepo("releases"),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+  libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6")
 )
 
 lazy val flaSettings = buildSettings ++ commonSettings

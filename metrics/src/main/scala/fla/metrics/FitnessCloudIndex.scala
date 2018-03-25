@@ -32,7 +32,7 @@ object FitnessCloudIndex {
         newPoint <- Step pointR z.map(Point(_, pos.boundary))
         newSol   <- Step evalP newPoint
         sorted   <- Step.withCompare { o =>
-          NonEmptyList(point, newSol).sortWith((a, b) => Comparison.fittest(a, b) apply o)
+          NonEmptyList(point, newSol).sortWith((a, b) => Comparison.fitter(a, b) apply o)
         }
       } yield Entity(Mem(sorted.head, pos.zeroed), sorted.last)
     }
@@ -53,7 +53,7 @@ object FitnessCloudIndex {
         i2     <- alg run i1
         zipped  = (i0 zip i2).list.filter { case (i0i, i2i) => inBounds(i2i) }
         better <- Step.withCompare { o =>
-          zipped filter { case (i0i, i2i) => Comparison.fittest(i2i.pos, i0i.pos) apply o }
+          zipped filter { case (i0i, i2i) => Comparison.fitter(i2i.pos, i0i.pos) apply o }
         }
       } yield zipped.length match {
         case 0 => "Not enough final particles to calculate fitness cloud index".left[Double]
