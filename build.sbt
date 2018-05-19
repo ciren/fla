@@ -1,6 +1,6 @@
 name := "fla"
 
-val benchmarksVersion = "0.1.3-SNAPSHOT"
+val benchmarksVersion = "0.1.1"
 val scalazVersion     = "7.2.20"
 val spireVersion      = "0.13.0"
 val scalacheckVersion = "1.12.6" // remain on 1.12.x because scalaz-binding is built against this version
@@ -9,8 +9,8 @@ val shapelessVersion  = "2.3.3"
 
 lazy val buildSettings = Seq(
   organization := "net.cilib",
-  scalaVersion := "2.12.5",
-  version := "0.0.2"
+  scalaVersion := "2.12.6",
+  version := "0.0.3"
 )
 
 lazy val commonSettings = Seq(
@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:experimental.macros",
     "-unchecked",
-    "-Xfatal-warnings",
+    //"-Xfatal-warnings",
     "-Xlint",
     "-Yno-adapted-args",
     "-Ywarn-dead-code",
@@ -32,8 +32,9 @@ lazy val commonSettings = Seq(
     "-Xfuture"
   ),
   coverageExcludedPackages := "fla\\.example\\..*",
-  resolvers += Resolver.sonatypeRepo("releases"),
-  resolvers += Resolver.sonatypeRepo("snapshots"),
+//  resolvers += Resolver.sonatypeRepo("releases"),
+//  resolvers += Resolver.sonatypeRepo("snapshots"),
+  publishMavenStyle := true,
   libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6")
 )
 
@@ -56,7 +57,6 @@ lazy val metrics = project
   .settings(flaSettings ++ Seq(
     moduleName := "fla-metrics",
     libraryDependencies ++= Seq(
-      "net.cilib" %% "benchmarks" % benchmarksVersion,
       "net.cilib" %% "cilib-core" % cilibVersion,
       "net.cilib" %% "cilib-pso"  % cilibVersion
     )
@@ -69,7 +69,8 @@ lazy val example = project
     libraryDependencies ++= Seq(
       "net.cilib"   %% "benchmarks" % benchmarksVersion,
       "net.cilib"   %% "cilib-core" % cilibVersion,
-      "com.chuusai" %% "shapeless"  % shapelessVersion
+      "com.chuusai" %% "shapeless"  % shapelessVersion,
+      "eu.timepit"  %% "refined" % "0.8.7"
     )
   ))
 

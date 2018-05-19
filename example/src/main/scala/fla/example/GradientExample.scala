@@ -6,13 +6,11 @@ import Scalaz._
 import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 
-import shapeless._
 import spire.math.Interval
 import spire.implicits._
 
 import cilib._
 import benchmarks.Benchmarks
-import benchmarks.implicits._
 import metrics.Gradient
 import walks.RandomProgressiveManhattanWalk
 
@@ -29,15 +27,16 @@ object GradientExample extends SafeApp {
     dev       <- Gradient.dev(stepSize)(solutions)
   } yield (avg, dev, max)
 
-  val f = Benchmarks.spherical[nat._2,Double] _
+  val f = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double])
 
   val env = Environment(
     cmp = Comparison dominance Min,
-    eval = f.unconstrained.eval
+    eval = f.eval
   )
 
   override val runc: IO[Unit] = {
     val result = gradients.run(env) eval RNG.fromTime
+
     putStrLn(result.toString)
   }
 }
