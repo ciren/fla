@@ -29,6 +29,7 @@ lazy val commonSettings = Seq(
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
+    "-Ypartial-unification", // Enable partial unification in type constructor inference
     "-Xfuture"
   ),
   coverageExcludedPackages := "fla\\.example\\..*",
@@ -79,6 +80,7 @@ lazy val tests = project
   .settings(flaSettings ++ Seq(
     moduleName := "fla-tests",
     libraryDependencies ++= Seq(
+      "net.cilib"   %% "benchmarks" % benchmarksVersion,
       "org.scalacheck" %% "scalacheck"                % scalacheckVersion % "test",
       "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion     % "test"
     )

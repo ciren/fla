@@ -21,7 +21,7 @@ object FitnessDistanceCorrelationExample extends SafeApp {
 
   val fdc = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     metric    <- FitnessDistanceCorrelation(solutions)
   } yield metric
 

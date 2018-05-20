@@ -23,7 +23,7 @@ object FirstEntropicMeasureExample extends SafeApp {
   def femFromStepSize(ss: Double) =
     for {
       points    <- Step pointR RandomProgressiveWalk(domain, 100, stepSize(ss, domain.head))
-      solutions <- points traverseU Step.evalP[Double]
+      solutions <- points traverse Step.evalP[Double]
       fem       <- FirstEntropicMeasure(solutions)
     } yield fem
 

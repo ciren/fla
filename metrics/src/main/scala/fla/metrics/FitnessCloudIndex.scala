@@ -45,7 +45,7 @@ object FitnessCloudIndex {
   val metric: PSOAlg => SimpleFunctionMetric[Double] =
     alg => solutions => {
       // 3
-      val iteration0 = solutions traverseU createParticle
+      val iteration0 = solutions traverse createParticle
 
       for {
         i0     <- iteration0
@@ -55,10 +55,9 @@ object FitnessCloudIndex {
         better <- Step.withCompare { o =>
           zipped filter { case (i0i, i2i) => Comparison.fitter(i2i.pos, i0i.pos) apply o }
         }
-      } yield zipped.length match {
-        case 0 => "Not enough final particles to calculate fitness cloud index".left[Double]
-        case l => (better.length.toDouble / l).right[String]
-      }
+        result <- if (zipped.isEmpty) Step.failString[Double,Double]("Not enough final particles to calculate fitness cloud index")
+                  else Step.point[Double,Double](better.length.toDouble / zipped.length.toDouble)
+      } yield result
     }
 
   val cognitive: SimpleFunctionMetric[Double] = {
@@ -102,13 +101,10 @@ object FitnessCloudIndex {
   val meanOfStdDev: Int => SimpleFunctionMetric[Double] =
     repeats => solutions => {
       val samples = (0 until repeats).toList.toNel.get
-      val cognitives = samples traverseU { i => cognitive(solutions) } map { _.sequenceU }
-      val socials    = samples traverseU { i => social(solutions)    } map { _.sequenceU }
+      val cognitives: Step[Double,NonEmptyList[Double]] = samples traverse { i => cognitive(solutions) }
+      val socials: Step[Double,NonEmptyList[Double]]    = samples traverse { i => social(solutions)    }
 
-      for {
-        c <- cognitives
-        s <- socials
-      } yield (c |@| s) { (cs, ss) => (Helpers.dev(cs) + Helpers.dev(ss)) / 2 }
+      (cognitives |@| socials) { (cs, ss) => (Helpers.dev(cs) + Helpers.dev(ss)) / 2.0 }
     }
 
 }

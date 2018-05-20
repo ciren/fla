@@ -6,7 +6,6 @@ import Scalaz._
 import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 
-import eu.timepit.refined._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
 
@@ -23,7 +22,7 @@ object InformationLandscapeExample extends SafeApp {
 
   val il = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     metric    <- InformationLandscape(solutions)
   } yield metric
 

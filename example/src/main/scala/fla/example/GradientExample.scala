@@ -21,7 +21,7 @@ object GradientExample extends SafeApp {
 
   val gradients = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     avg       <- Gradient.avg(stepSize)(solutions)
     max       <- Gradient.max(stepSize)(solutions)
     dev       <- Gradient.dev(stepSize)(solutions)

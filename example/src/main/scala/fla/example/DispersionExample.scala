@@ -21,7 +21,7 @@ object DispersionExample extends SafeApp {
 
   val dispersion = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     metric    <- Dispersion(.1)(solutions)
   } yield metric
 

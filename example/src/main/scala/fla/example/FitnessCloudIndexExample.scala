@@ -6,7 +6,6 @@ import Scalaz._
 import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 
-import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
@@ -25,12 +24,12 @@ object FitnessCloudIndexExample extends SafeApp {
 
   val points = Position.createPositions(domain, 500)
 
-  val fci = for {
-    ps  <- Step.pointR(points)
-    cog <- FitnessCloudIndex cognitive ps
-    soc <- FitnessCloudIndex social ps
-    dev <- FitnessCloudIndex.meanOfStdDev(30)(ps)
-  } yield (cog |@| soc |@| dev) { (_, _, _) }
+  val fci =
+    Step.pointR(points)
+      .flatMap(ps =>
+        (FitnessCloudIndex.cognitive(ps) |@|
+          FitnessCloudIndex.social(ps) |@|
+          FitnessCloudIndex.meanOfStdDev(30)(ps)) { Tuple3.apply })
 
   val f = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double])
 
