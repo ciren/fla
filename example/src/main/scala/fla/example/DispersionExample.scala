@@ -8,13 +8,11 @@ import scalaz.effect.IO.putStrLn
 
 import eu.timepit.refined.auto._
 
-import shapeless._
 import spire.math.Interval
 import spire.implicits._
 
 import cilib._
 import benchmarks.Benchmarks
-import benchmarks.implicits._
 import metrics.Dispersion
 
 object DispersionExample extends SafeApp {
@@ -23,15 +21,15 @@ object DispersionExample extends SafeApp {
 
   val dispersion = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     metric    <- Dispersion(.1)(solutions)
   } yield metric
 
-  val f = Benchmarks.spherical[nat._2,Double] _
+  val f = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double])
 
   val env = Environment(
     cmp = Comparison dominance Min,
-    eval = f.unconstrained.eval
+    eval = f.eval
   )
 
   override val runc: IO[Unit] = {

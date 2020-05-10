@@ -11,36 +11,36 @@ import cilib._
 
 object Helpers {
   implicit val positionFoldable = Position.positionFoldable1
+
   def euclid = MetricSpace.minkowski[Position,Double,Double](2).dist _
 
   def toSized2And[A](x: NonEmptyList[A]): String \/ NonEmptyList[A] =
     if (x.length >= 2) x.right[String]
     else "Cannot convert input to Sized2And".left[NonEmptyList[A]]
 
-  def fitnesses(solutions: NonEmptyList[Position[Double]]): String \/ NonEmptyList[Double] =
+  def fitnesses(solutions: NonEmptyList[Position[Double]]): Step[Double, NonEmptyList[Double]] =
     solutions
-      .traverse(_.objective)
-      .toRightDisjunction("Points have not been evaluated")
-      .flatMap(_.traverseU(_ match {
-        case Single(f, _) => f.fold(_.original.v, _.v, _.v).right[String]
-        case Multi(_)     => "Multi objective solutions are not supported".left[Double]
-      }))
-
-  def fittest[A](solutions: NonEmptyList[Position[A]], comp: Comparison): String \/ Position[A] =
-    solutions
-      .traverseU(_ match {
-        case s @ Solution(_, _, _) => s.right[String]
-        case Point(_, _) => "One or more points have not been evaluated".left[Position[A]]
+      .traverse(_.objective match {
+        case Some(Single(f, _)) => Step.point(f.fold(_.original.v, _.v, _.v))
+        case Some(Multi(_))     => Step.failString("Multi objective solutions are not supported")
+        case None               => Step.failString("Unevaluated position located")
       })
-      .map(_.foldLeft1((a, b) => Comparison.compare(a, b) apply comp))
 
-  def sort[A](solutions: NonEmptyList[Position[A]], comp: Comparison): String \/ NonEmptyList[Position[A]] =
+  def fittest[A](solutions: NonEmptyList[Position[A]]): Step[Double, Position[A]] =
     solutions
-      .traverseU(_ match {
-        case s @ Solution(_, _, _) => s.right[String]
-        case Point(_, _) => "One or more points have not been evaluated".left[Position[A]]
+      .traverse(_ match {
+        case s @ Solution(_, _, _) => Step.point[Double,Position[A]](s)
+        case Point(_, _) => Step.failString[Double, Position[A]]("One or more points have not been evaluated")
       })
-      .map(_.sortWith((a, b) => Comparison.fitter(a, b) apply comp))
+      .flatMap(x => Step.withCompare(comp => x.foldLeft1((a, b) => Comparison.compare(a, b) apply comp)))
+
+  def sort[A](solutions: NonEmptyList[Position[A]]): Step[A, NonEmptyList[Position[A]]] =
+    solutions
+      .traverse(_ match {
+        case s @ Solution(_, _, _) => Step.point[A, Position[A]](s)
+        case Point(_, _) => Step.failString[A, Position[A]]("One or more points have not been evaluated")
+      })
+      .flatMap(x => Step.withCompare(comp => x.sortWith((a, b) => Comparison.fitter(a, b) apply comp)))
 
   def mean(xs: NonEmptyList[Double]) =
     xs.suml1 / xs.count

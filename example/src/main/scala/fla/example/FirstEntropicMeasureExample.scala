@@ -6,13 +6,11 @@ import Scalaz._
 import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 
-import shapeless._
 import spire.math.Interval
 import spire.implicits._
 
 import cilib._
 import benchmarks.Benchmarks
-import benchmarks.implicits._
 import metrics.FirstEntropicMeasure
 import walks.RandomProgressiveWalk
 
@@ -25,7 +23,7 @@ object FirstEntropicMeasureExample extends SafeApp {
   def femFromStepSize(ss: Double) =
     for {
       points    <- Step pointR RandomProgressiveWalk(domain, 100, stepSize(ss, domain.head))
-      solutions <- points traverseU Step.evalP[Double]
+      solutions <- points traverse Step.evalP[Double]
       fem       <- FirstEntropicMeasure(solutions)
     } yield fem
 
@@ -33,11 +31,11 @@ object FirstEntropicMeasureExample extends SafeApp {
   val femMicro = femFromStepSize(.01)
   val both = (femMacro |@| femMicro) { (_, _) }
 
-  val f = Benchmarks.spherical[nat._2,Double] _
+  val f = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double])
 
   val env = Environment(
     cmp = Comparison dominance Min,
-    eval = f.unconstrained.eval
+    eval = f.eval
   )
 
   override val runc: IO[Unit] = {

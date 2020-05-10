@@ -7,35 +7,34 @@ import scalaz.effect._
 import scalaz.effect.IO.putStrLn
 
 import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric._
 
-import shapeless._
 import spire.math.Interval
 import spire.implicits._
 
 import cilib._
 import benchmarks.Benchmarks
-import benchmarks.implicits._
 import metrics.InformationLandscape
 
-object informationLandscapeExample extends SafeApp {
+object InformationLandscapeExample extends SafeApp {
   val domain = Interval(-10.0, 10.0)^2
   val points = Position.createPositions(domain, 100)
 
   val il = for {
     ps        <- Step.pointR(points)
-    solutions <- ps traverseU Step.evalP[Double]
+    solutions <- ps traverse Step.evalP[Double]
     metric    <- InformationLandscape(solutions)
   } yield metric
 
-  val f = Benchmarks.spherical[nat._2,Double] _
+  val f = Eval.unconstrained(Benchmarks.spherical[NonEmptyList,Double])
 
   val env = Environment(
     cmp = Comparison dominance Min,
-    eval = f.unconstrained.eval
+    eval = f.eval
   )
 
   override val runc: IO[Unit] = {
-    val result = il.run(env) eval RNG.fromTime
+    val result = il.run(env).eval(RNG.fromTime)
     putStrLn(result.toString)
   }
 }

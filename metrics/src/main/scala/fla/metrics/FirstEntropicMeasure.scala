@@ -1,7 +1,7 @@
 package fla
 package metrics
 
-import scalaz.NonEmptyList
+import scalaz._
 import scalaz.Scalaz._
 
 import spire.math.{abs,log,pow}
@@ -84,7 +84,7 @@ object FirstEntropicMeasure {
         -entropy.sum
       }
 
-      val fits = fitnesses(solutions)
+      val fits: Step[Double, NonEmptyList[Double]] = fitnesses(solutions)
 
       val increment = 0.05
       val numEpsilons = (1.0 / increment).toInt + 1
@@ -93,14 +93,15 @@ object FirstEntropicMeasure {
         if (i < numEpsilons) getEpsilons(e.updated(i, es * mult), mult + increment, i + 1, es)
         else e
 
-      val max = for {
+      for {
         f          <- fits
-        x2         <- toSized2And(f)
+        x2         <- toSized2And(f) match {
+          case -\/(error) => Step.failString[Double,NonEmptyList[Double]](error)
+          case \/-(value) => Step.point[Double,NonEmptyList[Double]](value)
+        }
         epsilonStar = infoStability(x2)
         epsilons    = getEpsilons(List.fill(numEpsilons)(0), 0.0, 0, epsilonStar)
         es          = epsilons map { e => infoContent(e, x2) }
       } yield es.max
-
-      Step.point(max)
     }
 }
