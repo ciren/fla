@@ -1,6 +1,5 @@
 # fla
 
-[![Build Status](https://travis-ci.org/cirg-up/fla.svg?branch=master)](https://travis-ci.org/cirg-up/fla)
 [![codecov.io](https://codecov.io/github/cirg-up/fla/coverage.svg?branch=master)](https://codecov.io/github/cirg-up/fla?branch=master)
 
 A collection of traversal algorithms and function metrics used in Fitness Landscape Analysis
