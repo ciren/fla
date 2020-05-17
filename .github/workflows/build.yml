@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - uses: cachix/install-nix-action@v6
+
+      - run: nix-shell --run 'sbt -Dsbt.supershell=false test'
+
+      - uses: codecov/codecov-action@v1
